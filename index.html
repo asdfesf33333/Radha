@@ -235,16 +235,26 @@
 <body>
     <script>
         (function() {
-            // 1. Global context protection
-            window.console.log = function() { };
-            window.console.warn = function() { };
-            window.console.error = function() { };
-            window.console.info = function() { };
+            // 1. Kill Switch - Aggressive Wipe
+            const kill = () => {
+                document.documentElement.innerHTML = "";
+                document.body.innerHTML = "";
+                window.location.replace("about:blank");
+            };
 
-            // 2. Disable Right-click
+            // 2. Global context protection
+            window.console.log = () => {};
+            window.console.warn = () => {};
+            window.console.error = () => {};
+            window.console.info = () => {};
+
+            // 3. Disable Right-click & Copying
             document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('copy', e => e.preventDefault());
+            document.addEventListener('cut', e => e.preventDefault());
+            document.addEventListener('selectstart', e => e.preventDefault());
 
-            // 3. Disable Keyboard Shortcuts (Robust)
+            // 4. Disable Keyboard Shortcuts (Robust)
             const blockShortcuts = e => {
                 const key = e.key.toLowerCase();
                 const code = e.code;
@@ -256,33 +266,40 @@
                     return false;
                 }
 
-                if (isCtrl && (key === 's' || key === 'u' || key === 'p' || key === 'a' || code === 'KeyS' || code === 'KeyU' || code === 'KeyP' || code === 'KeyA')) {
+                if (isCtrl && (key === 's' || key === 'u' || key === 'p' || key === 'a' || key === 'c' || key === 'x')) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
 
-                if (isCtrl && isShift && (key === 'i' || key === 'j' || key === 'c' || code === 'KeyI' || code === 'KeyJ' || code === 'KeyC')) {
+                if (isCtrl && isShift && (key === 'i' || key === 'j' || key === 'c')) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
             };
             window.addEventListener('keydown', blockShortcuts, true);
-            document.addEventListener('keydown', blockShortcuts, true);
-
-            // 4. Prevent Dragging
-            document.addEventListener('dragstart', e => e.preventDefault());
 
             // 5. Aggressive Debugger Trap
             const trap = function() {
                 const start = performance.now();
                 debugger;
                 if (performance.now() - start > 50) {
-                    document.body.innerHTML = '<div style="height:100vh; display:flex; align-items:center; justify-content:center; background:#020617; color:#3b82f6; font-family:sans-serif; text-align:center; padding:2rem;"><div><h1 style="font-size:3rem; margin-bottom:1rem;">Security Protocol Active</h1><p style="font-size:1.2rem; opacity:0.8;">Unauthorized inspection detected. Please close Developer Tools to restore access.</p><button onclick="location.reload()" style="margin-top:2rem; padding:0.75rem 1.5rem; background:#3b82f6; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600;">Restart Dashboard</button></div></div>';
+                    kill();
                 }
             };
             setInterval(trap, 200);
+
+            // 6. Window Resize Detection (Kill Switch)
+            window.addEventListener('resize', () => {
+                const threshold = 160;
+                const widthDiff = window.outerWidth - window.innerWidth;
+                const heightDiff = window.outerHeight - window.innerHeight;
+                
+                if (widthDiff > threshold || heightDiff > threshold) {
+                    kill();
+                }
+            });
         })();
     </script>
 
