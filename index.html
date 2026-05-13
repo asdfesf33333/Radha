@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Head Dashboard | Command Center</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            /* Dark Theme (Default) */
+            --bg-body: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-header: rgba(15, 23, 42, 0.8);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.8);
+            --bg-header: rgba(248, 250, 252, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: rgba(0, 0, 0, 0.1);
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.2);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Background Shapes */
+        .bg-shape {
+            position: fixed;
+            z-index: -1;
+            filter: blur(80px);
+            border-radius: 50%;
+            opacity: 0.15;
+        }
+        .shape-1 { width: 400px; height: 400px; background: var(--accent); top: -100px; right: -100px; }
+        .shape-2 { width: 300px; height: 300px; background: var(--danger); bottom: -50px; left: -50px; }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-header);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand .signature {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-top: -4px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Upload Area */
+        .upload-section {
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .upload-section i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .upload-section h2 { margin-bottom: 0.5rem; }
+        .upload-section p { color: var(--text-muted); }
+
+        /* Dashboard Grid */
+        .dashboard-content {
+            display: none; /* Hidden until data is loaded */
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent);
+        }
+
+        .kpi-title { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .kpi-value { font-size: 1.75rem; font-weight: 700; }
+        .kpi-trend { font-size: 0.75rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 4px; }
+        .trend-up { color: var(--danger); }
+        .trend-down { color: var(--success); }
+
+        /* Chart Grid */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .chart-card.full-width { grid-column: span 2; }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title { font-weight: 600; color: var(--text-main); }
+
+        /* Hidden File Input */
+        #fileInput { display: none; }
+
+        /* Loading Overlay */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border);
+            border-top: 5px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 992px) {
+            .chart-grid { grid-template-columns: 1fr; }
+            .chart-card.full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem;">Analyzing Factory Data...</p>
+    </div>
+
+    <header>
+        <div class="brand">
+            <h1>Factory Command Center</h1>
+            <div class="signature">Made by Parmita and Kritesh</div>
+        </div>
+        <div class="header-actions">
+            <div class="theme-toggle" id="themeToggle" title="Switch Theme">
+                <i data-lucide="sun" id="themeIcon"></i>
+            </div>
+            <button onclick="location.reload()" style="background:none; border:1px solid var(--border); color:var(--text-main); padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">
+                <i data-lucide="refresh-cw" style="width:16px; height:16px; vertical-align:middle; margin-right:4px;"></i> New File
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Initial Upload State -->
+        <div id="uploadContainer" class="upload-section" onclick="document.getElementById('fileInput').click()">
+            <i data-lucide="upload-cloud"></i>
+            <h2>Upload Factory Excel</h2>
+            <p>Drag and drop your .xlsx or .xls file here, or click to browse</p>
+            <p style="font-size: 0.75rem; margin-top: 1rem; color: var(--accent);">Required Columns: Date, Month, Line, Machine Name, 4M, Loss In MW, Total Downtime</p>
+            <input type="file" id="fileInput" accept=".xlsx, .xls">
+        </div>
+
+        <!-- Dashboard View (Initially Hidden) -->
+        <div id="dashboard" class="dashboard-content">
+            <!-- KPI Section -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Power Loss</div>
+                    <div class="kpi-value" id="kpi-loss">0 MW</div>
+                    <div class="kpi-trend" id="trend-loss">Calculated from data</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Downtime</div>
+                    <div class="kpi-value" id="kpi-downtime">0 Min</div>
+                    <div class="kpi-trend" id="trend-downtime">Total operational gap</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Avg Loss Per Incident</div>
+                    <div class="kpi-value" id="kpi-avg-loss">0 MW</div>
+                    <div class="kpi-trend">Impact per breakdown</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Top Bottleneck</div>
+                    <div class="kpi-value" id="kpi-top-machine">N/A</div>
+                    <div class="kpi-trend">Machine with highest loss</div>
+                </div>
+            </div>
+
+            <!-- Main Charts -->
+            <div class="chart-grid">
+                <!-- Trend Chart -->
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <div class="chart-title">Loss & Downtime Trend (Monthly)</div>
+                    </div>
+                    <div id="trendChart"></div>
+                </div>
+
+                <!-- 4M Distribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Root Cause Analysis (4M)</div>
+                    </div>
+                    <div id="donut4M"></div>
+                </div>
+
+                <!-- Pareto Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Top 10 Machines (by Loss MW)</div>
+                    </div>
+                    <div id="paretoChart"></div>
+                </div>
+
+                <!-- Department Breakdown -->
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <div class="chart-title">Downtime by Responsible Department</div>
+                    </div>
+                    <div id="deptChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // --- Theme Management ---
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const target = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', target);
+            
+            // Update Icon
+            const iconName = target === 'dark' ? 'sun' : 'moon';
+            themeIcon.setAttribute('data-lucide', iconName);
+            lucide.createIcons();
+            
+            // Update Charts if they exist
+            updateChartThemes(target);
+        });
+
+        // --- Data Processing Logic ---
+        let charts = {};
+        const fileInput = document.getElementById('fileInput');
+        const uploadContainer = document.getElementById('uploadContainer');
+        const dashboard = document.getElementById('dashboard');
+        const loader = document.getElementById('loader');
+
+        fileInput.addEventListener('change', handleFile);
+
+        // Drag and Drop support
+        uploadContainer.addEventListener('dragover', (e) => { e.preventDefault(); uploadContainer.style.borderColor = 'var(--accent)'; });
+        uploadContainer.addEventListener('dragleave', () => { uploadContainer.style.borderColor = 'var(--border)'; });
+        uploadContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (file) processFile(file);
+        }
+
+        function processFile(file) {
+            loader.style.display = 'flex';
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                
+                renderDashboard(jsonData);
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+
+        function renderDashboard(data) {
+            // Normalize Headers (Fuzzy matching)
+            const normalizedData = data.map(row => {
+                const clean = {};
+                for (let key in row) {
+                    const upper = key.toUpperCase().trim();
+                    if (upper.includes('DATE')) clean.date = row[key];
+                    if (upper.includes('MONTH')) clean.month = row[key];
+                    if (upper.includes('MACHINE NAME')) clean.machine = row[key];
+                    if (upper.includes('4M')) clean.m4 = row[key];
+                    if (upper.includes('LOSS IN MW')) clean.loss = parseFloat(row[key]) || 0;
+                    if (upper.includes('DOWNTIME')) clean.downtime = parseFloat(row[key]) || 0;
+                    if (upper.includes('DEPARTMENT')) clean.dept = row[key];
+                }
+                return clean;
+            });
+
+            // Calculate KPIs
+            const totalLoss = normalizedData.reduce((sum, r) => sum + r.loss, 0);
+            const totalDowntime = normalizedData.reduce((sum, r) => sum + r.downtime, 0);
+            const avgLoss = normalizedData.length > 0 ? (totalLoss / normalizedData.length) : 0;
+            
+            // Find Top Machine
+            const machineMap = {};
+            normalizedData.forEach(r => {
+                machineMap[r.machine] = (machineMap[r.machine] || 0) + r.loss;
+            });
+            const topMachine = Object.entries(machineMap).sort((a,b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+            // Update UI
+            document.getElementById('kpi-loss').innerText = totalLoss.toFixed(1) + ' MW';
+            document.getElementById('kpi-downtime').innerText = totalDowntime.toLocaleString() + ' Min';
+            document.getElementById('kpi-avg-loss').innerText = avgLoss.toFixed(2) + ' MW';
+            document.getElementById('kpi-top-machine').innerText = topMachine;
+
+            // Prepare Chart Data
+            renderCharts(normalizedData);
+
+            // Toggle Visibility
+            uploadContainer.style.display = 'none';
+            dashboard.style.display = 'block';
+            loader.style.display = 'none';
+        }
+
+        function renderCharts(data) {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const theme = isDark ? 'dark' : 'light';
+
+            // 1. Monthly Trend
+            const monthMap = {};
+            data.forEach(r => {
+                if (!monthMap[r.month]) monthMap[r.month] = { loss: 0, downtime: 0 };
+                monthMap[r.month].loss += r.loss;
+                monthMap[r.month].downtime += r.downtime;
+            });
+            const months = Object.keys(monthMap);
+
+            charts.trend = new ApexCharts(document.querySelector("#trendChart"), {
+                series: [
+                    { name: 'Loss (MW)', type: 'area', data: months.map(m => monthMap[m].loss.toFixed(1)) },
+                    { name: 'Downtime (Min)', type: 'line', data: months.map(m => monthMap[m].downtime) }
+                ],
+                chart: { height: 350, type: 'line', toolbar: { show: false }, theme: { mode: theme } },
+                colors: ['#3b82f6', '#f59e0b'],
+                stroke: { width: [4, 4], curve: 'smooth' },
+                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.1 } },
+                xaxis: { categories: months },
+                yaxis: [
+                    { title: { text: 'Loss MW' } },
+                    { opposite: true, title: { text: 'Downtime Min' } }
+                ],
+                theme: { mode: theme }
+            });
+
+            // 2. 4M Donut
+            const m4Map = {};
+            data.forEach(r => { if(r.m4) m4Map[r.m4] = (m4Map[r.m4] || 0) + 1; });
+            
+            charts.donut = new ApexCharts(document.querySelector("#donut4M"), {
+                series: Object.values(m4Map),
+                chart: { type: 'donut', height: 350 },
+                labels: Object.keys(m4Map),
+                colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                legend: { position: 'bottom' },
+                theme: { mode: theme }
+            });
+
+            // 3. Pareto (Machine vs Loss)
+            const sortedMachines = Object.entries(machineMap).sort((a,b) => b[1] - a[1]).slice(0, 10);
+            
+            charts.pareto = new ApexCharts(document.querySelector("#paretoChart"), {
+                series: [{ name: 'Loss MW', data: sortedMachines.map(s => s[1].toFixed(1)) }],
+                chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                plotOptions: { bar: { borderRadius: 4, horizontal: true } },
+                colors: ['#ef4444'],
+                xaxis: { categories: sortedMachines.map(s => s[0]) },
+                theme: { mode: theme }
+            });
+
+            // 4. Dept Breakdown
+            const deptMap = {};
+            data.forEach(r => { if(r.dept) deptMap[r.dept] = (deptMap[r.dept] || 0) + r.downtime; });
+            
+            charts.dept = new ApexCharts(document.querySelector("#deptChart"), {
+                series: [{ name: 'Total Downtime', data: Object.values(deptMap) }],
+                chart: { type: 'bar', height: 300, toolbar: { show: false } },
+                xaxis: { categories: Object.keys(deptMap) },
+                colors: ['#8b5cf6'],
+                theme: { mode: theme }
+            });
+
+            // Initial Render
+            Object.values(charts).forEach(c => c.render());
+        }
+
+        function updateChartThemes(theme) {
+            Object.values(charts).forEach(c => {
+                c.updateOptions({ theme: { mode: theme } });
+            });
+        }
+    </script>
+</body>
+</html>
