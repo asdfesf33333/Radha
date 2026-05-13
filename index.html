@@ -244,17 +244,35 @@
             // 2. Disable Right-click
             document.addEventListener('contextmenu', e => e.preventDefault());
 
-            // 3. Disable Keyboard Shortcuts
-            document.addEventListener('keydown', e => {
-                const forbiddenKeys = ['F12', 'F11', 'I', 'J', 'U', 'C'];
-                if (forbiddenKeys.includes(e.key) || 
-                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
-                    (e.ctrlKey && (e.key === 'U' || e.key === 'S'))) {
+            // 3. Disable Keyboard Shortcuts (Robust)
+            const blockShortcuts = e => {
+                const key = e.key.toLowerCase();
+                const code = e.code;
+                const isCtrl = e.ctrlKey || e.metaKey; // Support for Mac Cmd key
+                const isShift = e.shiftKey;
+
+                // Disable F12, F11, F10
+                if (['F12', 'F11', 'F10'].includes(e.key)) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Disable Ctrl+S, Ctrl+U, Ctrl+P (Print), Ctrl+A (Select All)
+                if (isCtrl && (key === 's' || key === 'u' || key === 'p' || key === 'a' || code === 'KeyS' || code === 'KeyU' || code === 'KeyP' || code === 'KeyA')) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
-            });
+
+                // Disable Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (DevTools)
+                if (isCtrl && isShift && (key === 'i' || key === 'j' || key === 'c' || code === 'KeyI' || code === 'KeyJ' || code === 'KeyC')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            };
+            window.addEventListener('keydown', blockShortcuts, true);
+            document.addEventListener('keydown', blockShortcuts, true);
 
             // 4. Prevent Dragging
             document.addEventListener('dragstart', e => e.preventDefault());
