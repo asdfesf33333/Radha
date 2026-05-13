@@ -15,31 +15,31 @@
     
     <style>
         :root {
-            /* Dark Theme (Default) */
-            --bg-body: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --bg-header: rgba(15, 23, 42, 0.8);
+            /* Dark Theme (Premium) */
+            --bg-body: #020617;
+            --bg-card: rgba(15, 23, 42, 0.6);
+            --bg-header: rgba(2, 6, 23, 0.8);
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.05);
             --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.5);
+            --accent-glow: rgba(59, 130, 246, 0.2);
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --card-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
         }
 
         [data-theme="light"] {
-            --bg-body: #f8fafc;
-            --bg-card: rgba(255, 255, 255, 0.8);
-            --bg-header: rgba(248, 250, 252, 0.8);
+            --bg-body: #f1f5f9;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-header: rgba(255, 255, 255, 0.8);
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border: rgba(0, 0, 0, 0.1);
+            --border: rgba(0, 0, 0, 0.05);
             --accent: #2563eb;
-            --accent-glow: rgba(37, 99, 235, 0.2);
-            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            --accent-glow: rgba(37, 99, 235, 0.1);
+            --card-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
         }
 
         * {
@@ -47,7 +47,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Outfit', sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
         body {
@@ -55,18 +55,10 @@
             color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.05) 0px, transparent 50%);
         }
-
-        /* Glassmorphism Background Shapes */
-        .bg-shape {
-            position: fixed;
-            z-index: -1;
-            filter: blur(80px);
-            border-radius: 50%;
-            opacity: 0.15;
-        }
-        .shape-1 { width: 400px; height: 400px; background: var(--accent); top: -100px; right: -100px; }
-        .shape-2 { width: 300px; height: 300px; background: var(--danger); bottom: -50px; left: -50px; }
 
         /* Header */
         header {
@@ -74,135 +66,105 @@
             top: 0;
             z-index: 100;
             background: var(--bg-header);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
+            padding: 0.75rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .brand h1 {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            background: linear-gradient(to right, var(--accent), #60a5fa);
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .brand h1 {
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .brand .signature {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            margin-top: -4px;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .theme-toggle {
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
         }
 
         /* Main Layout */
         .container {
             max-width: 1400px;
-            margin: 2rem auto;
+            margin: 4rem auto;
             padding: 0 2rem;
         }
 
-        /* Upload Area */
-        .upload-section {
-            background: var(--bg-card);
-            border: 2px dashed var(--border);
-            border-radius: 1.5rem;
-            padding: 3rem;
-            text-align: center;
-            cursor: pointer;
+        .section-header {
             margin-bottom: 2rem;
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 3rem;
         }
 
-        .upload-section:hover {
-            border-color: var(--accent);
-            background: rgba(59, 130, 246, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .upload-section i {
-            font-size: 3rem;
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             color: var(--accent);
-            margin-bottom: 1rem;
+            white-space: nowrap;
         }
 
-        .upload-section h2 { margin-bottom: 0.5rem; }
-        .upload-section p { color: var(--text-muted); }
-
-        /* Dashboard Grid */
-        .dashboard-content {
-            display: none; /* Hidden until data is loaded */
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .divider {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
 
         /* KPI Cards */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 5rem;
         }
 
         .kpi-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            padding: 1.5rem;
-            border-radius: 1rem;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
             box-shadow: var(--card-shadow);
-            position: relative;
-            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
         }
 
-        .kpi-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--accent);
+        .kpi-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
-
-        .kpi-title { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem; }
-        .kpi-value { font-size: 1.75rem; font-weight: 700; }
-        .kpi-trend { font-size: 0.75rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 4px; }
-        .trend-up { color: var(--danger); }
-        .trend-down { color: var(--success); }
 
         /* Chart Grid */
         .chart-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
+            gap: 3rem;
         }
 
         .chart-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            padding: 1.5rem;
-            border-radius: 1rem;
+            padding: 2.5rem;
+            border-radius: 2rem;
             box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
         }
 
         .chart-card.full-width { grid-column: span 2; }
@@ -284,8 +246,15 @@
 
         <!-- Dashboard View (Initially Hidden) -->
         <div id="dashboard" class="dashboard-content">
+            
+            <div class="section-header" style="margin-top: 0;">
+                <div class="section-title">Performance Snapshot</div>
+                <div class="divider"></div>
+            </div>
+
             <!-- KPI Section -->
             <div class="kpi-grid">
+                <!-- KPI cards remain same -->
                 <div class="kpi-card">
                     <div class="kpi-title">Total Power Loss</div>
                     <div class="kpi-value" id="kpi-loss">0 MW</div>
@@ -306,6 +275,11 @@
                     <div class="kpi-value" id="kpi-top-machine">N/A</div>
                     <div class="kpi-trend">Machine with highest loss</div>
                 </div>
+            </div>
+
+            <div class="section-header">
+                <div class="section-title">Deep Dive Analytics</div>
+                <div class="divider"></div>
             </div>
 
             <!-- Main Charts -->
@@ -391,34 +365,54 @@
             if (file) processFile(file);
         }
 
+        function parseNum(val) {
+            if (typeof val === 'number') return val;
+            if (typeof val === 'string') {
+                // Remove everything except numbers and decimal points
+                const clean = val.replace(/[^0-9.-]+/g, "");
+                const num = parseFloat(clean);
+                return isNaN(num) ? 0 : num;
+            }
+            return 0;
+        }
+
         function processFile(file) {
             loader.style.display = 'flex';
             const reader = new FileReader();
             
             reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                
-                renderDashboard(jsonData);
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (!jsonData || jsonData.length === 0) {
+                        throw new Error("Excel file is empty or headers are missing.");
+                    }
+                    
+                    renderDashboard(jsonData);
+                } catch (err) {
+                    loader.style.display = 'none';
+                    alert("Error: " + err.message + "\nPlease ensure your Excel file has the correct headers.");
+                }
             };
             
             reader.readAsArrayBuffer(file);
         }
 
         function renderDashboard(data) {
-            // Normalize Headers (Fuzzy matching)
+            // Normalize Headers with High Precision
             const normalizedData = data.map(row => {
-                const clean = {};
+                const clean = { machine: 'Unknown', m4: 'N/A', loss: 0, downtime: 0, month: 'Unknown' };
                 for (let key in row) {
                     const upper = key.toUpperCase().trim();
                     if (upper.includes('DATE')) clean.date = row[key];
-                    if (upper.includes('MONTH')) clean.month = row[key];
-                    if (upper.includes('MACHINE NAME')) clean.machine = row[key];
+                    if (upper === 'MONTH') clean.month = row[key];
+                    if (upper === 'MACHINE NAME' || upper === 'MACHINE') clean.machine = row[key];
                     if (upper.includes('4M')) clean.m4 = row[key];
-                    if (upper.includes('LOSS IN MW')) clean.loss = parseFloat(row[key]) || 0;
-                    if (upper.includes('DOWNTIME')) clean.downtime = parseFloat(row[key]) || 0;
+                    if (upper.includes('LOSS')) clean.loss = parseNum(row[key]);
+                    if (upper.includes('DOWNTIME')) clean.downtime = parseNum(row[key]);
                     if (upper.includes('DEPARTMENT')) clean.dept = row[key];
                 }
                 return clean;
@@ -429,15 +423,18 @@
             const totalDowntime = normalizedData.reduce((sum, r) => sum + r.downtime, 0);
             const avgLoss = normalizedData.length > 0 ? (totalLoss / normalizedData.length) : 0;
             
-            // Find Top Machine
-            const machineMap = {};
+            // Find Top Machine (Bottleneck)
+            const mDataMap = {};
             normalizedData.forEach(r => {
-                machineMap[r.machine] = (machineMap[r.machine] || 0) + r.loss;
+                if(r.machine && r.machine !== 'Unknown') {
+                    mDataMap[r.machine] = (mDataMap[r.machine] || 0) + r.loss;
+                }
             });
-            const topMachine = Object.entries(machineMap).sort((a,b) => b[1] - a[1])[0]?.[0] || 'N/A';
+            const topMachineEntry = Object.entries(mDataMap).sort((a,b) => b[1] - a[1])[0];
+            const topMachine = topMachineEntry ? topMachineEntry[0] : 'N/A';
 
             // Update UI
-            document.getElementById('kpi-loss').innerText = totalLoss.toFixed(1) + ' MW';
+            document.getElementById('kpi-loss').innerText = totalLoss.toLocaleString(undefined, {maximumFractionDigits:1}) + ' MW';
             document.getElementById('kpi-downtime').innerText = totalDowntime.toLocaleString() + ' Min';
             document.getElementById('kpi-avg-loss').innerText = avgLoss.toFixed(2) + ' MW';
             document.getElementById('kpi-top-machine').innerText = topMachine;
@@ -455,55 +452,66 @@
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const theme = isDark ? 'dark' : 'light';
 
+            // Common Options for Premium Look
+            const commonOptions = {
+                chart: { background: 'transparent', toolbar: { show: false } },
+                theme: { mode: theme },
+                grid: { borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }
+            };
+
             // 1. Monthly Trend
             const monthMap = {};
             data.forEach(r => {
-                if (!monthMap[r.month]) monthMap[r.month] = { loss: 0, downtime: 0 };
-                monthMap[r.month].loss += r.loss;
-                monthMap[r.month].downtime += r.downtime;
+                const m = r.month || 'Unknown';
+                if (!monthMap[m]) monthMap[m] = { loss: 0, downtime: 0 };
+                monthMap[m].loss += r.loss;
+                monthMap[m].downtime += r.downtime;
             });
             const months = Object.keys(monthMap);
 
             charts.trend = new ApexCharts(document.querySelector("#trendChart"), {
+                ...commonOptions,
                 series: [
                     { name: 'Loss (MW)', type: 'area', data: months.map(m => monthMap[m].loss.toFixed(1)) },
                     { name: 'Downtime (Min)', type: 'line', data: months.map(m => monthMap[m].downtime) }
                 ],
-                chart: { height: 350, type: 'line', toolbar: { show: false }, theme: { mode: theme } },
+                chart: { ...commonOptions.chart, height: 350, type: 'line' },
                 colors: ['#3b82f6', '#f59e0b'],
                 stroke: { width: [4, 4], curve: 'smooth' },
-                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.1 } },
+                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.6, opacityTo: 0.1 } },
                 xaxis: { categories: months },
                 yaxis: [
                     { title: { text: 'Loss MW' } },
                     { opposite: true, title: { text: 'Downtime Min' } }
-                ],
-                theme: { mode: theme }
+                ]
             });
 
             // 2. 4M Donut
             const m4Map = {};
-            data.forEach(r => { if(r.m4) m4Map[r.m4] = (m4Map[r.m4] || 0) + 1; });
+            data.forEach(r => { if(r.m4 && r.m4 !== 'N/A') m4Map[r.m4] = (m4Map[r.m4] || 0) + 1; });
             
             charts.donut = new ApexCharts(document.querySelector("#donut4M"), {
+                ...commonOptions,
                 series: Object.values(m4Map),
-                chart: { type: 'donut', height: 350 },
+                chart: { ...commonOptions.chart, type: 'donut', height: 350 },
                 labels: Object.keys(m4Map),
                 colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
                 legend: { position: 'bottom' },
-                theme: { mode: theme }
+                stroke: { show: false }
             });
 
             // 3. Pareto (Machine vs Loss)
-            const sortedMachines = Object.entries(machineMap).sort((a,b) => b[1] - a[1]).slice(0, 10);
+            const mParetoMap = {};
+            data.forEach(r => { if(r.machine && r.machine !== 'Unknown') mParetoMap[r.machine] = (mParetoMap[r.machine] || 0) + r.loss; });
+            const sortedMachines = Object.entries(mParetoMap).sort((a,b) => b[1] - a[1]).slice(0, 10);
             
             charts.pareto = new ApexCharts(document.querySelector("#paretoChart"), {
+                ...commonOptions,
                 series: [{ name: 'Loss MW', data: sortedMachines.map(s => s[1].toFixed(1)) }],
-                chart: { type: 'bar', height: 350, toolbar: { show: false } },
-                plotOptions: { bar: { borderRadius: 4, horizontal: true } },
+                chart: { ...commonOptions.chart, type: 'bar', height: 350 },
+                plotOptions: { bar: { borderRadius: 6, horizontal: true, barHeight: '60%' } },
                 colors: ['#ef4444'],
-                xaxis: { categories: sortedMachines.map(s => s[0]) },
-                theme: { mode: theme }
+                xaxis: { categories: sortedMachines.map(s => s[0]) }
             });
 
             // 4. Dept Breakdown
@@ -511,11 +519,12 @@
             data.forEach(r => { if(r.dept) deptMap[r.dept] = (deptMap[r.dept] || 0) + r.downtime; });
             
             charts.dept = new ApexCharts(document.querySelector("#deptChart"), {
+                ...commonOptions,
                 series: [{ name: 'Total Downtime', data: Object.values(deptMap) }],
-                chart: { type: 'bar', height: 300, toolbar: { show: false } },
+                chart: { ...commonOptions.chart, type: 'bar', height: 300 },
                 xaxis: { categories: Object.keys(deptMap) },
                 colors: ['#8b5cf6'],
-                theme: { mode: theme }
+                plotOptions: { bar: { borderRadius: 6, columnWidth: '40%' } }
             });
 
             // Initial Render
